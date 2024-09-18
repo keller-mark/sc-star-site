@@ -1,3 +1,28 @@
+import React from 'react';
+
+export function Card(props) {
+	const {
+		key,
+		data,
+	} = props;
+
+	const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
+
+	return (
+		<div className="link-card">
+			<img src={imgUrl} className="quote-img" title={`Figure from ${data.sourceEntry.data.name}`}/>
+
+			<div>
+				<div className="codes">
+					{data.codeEntries.map(code => (
+						<span className="code-pill">{code.data.name}</span>
+					))}
+				</div>
+		</div>
+		</div>
+	);
+}
+/*<
 ---
 interface Props {
 	data: any;
@@ -8,6 +33,8 @@ const { key, data } = Astro.props;
 
 const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
 ---
+
+
 
 <div class="link-card">
 	<img src={imgUrl} class="quote-img" title={`Figure from ${data.sourceEntry.data.name}`}/>
@@ -28,6 +55,7 @@ const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.pn
 		width: 100%;
 		height: 100%;
 		border: 1px solid rgba(0, 0, 0, 0.1);
+		box-sizing: border-box;
 	}
 	.img-container {
 		width: 100%;
@@ -38,6 +66,9 @@ const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.pn
 		max-height: 500px;
 		object-fit: contain;
 	}
+	.codes {
+		width: auto;
+	}
 	.code-pill {
 		display: inline;
 		background-color: lightblue;
@@ -46,3 +77,4 @@ const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.pn
 		margin: 0px 4px;
 	}
 </style>
+*/

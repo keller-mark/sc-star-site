@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import { App } from '../components/App.jsx';
 
 import { getCollection, getEntry, getEntries } from 'astro:content';
 
@@ -15,52 +15,69 @@ const quotes = await Promise.all((await getCollection('quotations')).map(async q
 	},
 })));
 
-console.log(await quotes)
+const codes = await getCollection('codes');
 
-const numPapers = (await getCollection('sources')).length;
-const numQuotes = (await getCollection('quotations')).length;
-const numCodes = (await getCollection('codes')).length;
+const codesWithQuotes = codes.map(code => ({
+	...code,
+	quotes: quotes.filter(quote => quote.data.codeEntries.some(coding => coding.data.guid === code.data.guid)),
+}));
+console.log(codesWithQuotes)
+
+
+const sources = await getCollection('sources');
+
 
 ---
 
 <Layout title="scSTAR">
-	<main>
-
-		<h1>scSTAR</h1>
-		<p>Number of papers: {numPapers}</p>
-		<p>Number of quotations: {numQuotes}</p>
-		<p>Number of codes: {numCodes}</p>
-
-		<div>
-			<p>Filter by code:</p>
-			TODO (allow filtering quotations by multiple codes with AND or OR)
-
-			<p>Filter by paper:</p>
-			<p>Filter by number of cells:</p>
-			<p>Filter by paper containing quote with code:</p>
-			<p>Filter by code group: </p>
-		</div>
-
-		
-		<div role="list" class="quote-cards">
-			{quotes.map(quote => (
-				<Card
-					key={quote.id}
-					data={quote.data}
-				/>
-			))}
-		</div>
-	</main>
+	<App
+		client:load
+		codes={codes}
+		sources={sources}
+		quotes={quotes}
+	/>
 </Layout>
 
-<style>
+<style is:global>
 	main {
 		
+	}
+	.cards-container {
+		width: 95%;
 	}
 	.quote-cards {
 		display: grid;
 		grid-gap: 1rem;
 		grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-
+		box-sizing: border-box;
+	}
+	.link-card {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+		display: inline-block;
+		width: 100%;
+		height: 100%;
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		box-sizing: border-box;
+	}
+	.img-container {
+		width: 100%;
+	}
+	.quote-img {
+		display: block;
+		max-width: 100%;
+		max-height: 500px;
+		object-fit: contain;
+	}
+	.codes {
+		width: auto;
+	}
+	.code-pill {
+		display: inline;
+		background-color: lightblue;
+		border-radius: 15px;
+		padding: 0px 8px;
+		margin: 0px 4px;
 	}
 </style>

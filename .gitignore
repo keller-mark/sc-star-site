@@ -24,4 +24,7 @@ pnpm-debug.log*
 .idea/
 
 src/images
-src/content
+src/content/codes
+src/content/sources
+src/content/quotations
+src/content/sets
