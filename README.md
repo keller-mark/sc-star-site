@@ -1,5 +1,7 @@
 # sc-star-site
 
+Static astro site to share literature survey qualitative coding results in the format output by [qdpx-to-json](https://github.com/keller-mark/qdpx-to-json).
+
 
 ```sh
 pnpm run dev
