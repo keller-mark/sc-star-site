@@ -30,7 +30,10 @@ export function FilterForm(props) {
     
     return (
         <div>
-            Filter: {predicates.map(predicate => "(" + predicate.join(" AND ") + ")").join(" OR ")}<br/>
+            Filter: {predicates.map(predicate => "(" + predicate.join(" AND ") + ")").join(" OR ")}
+            {predicates.length > 0 ? (<button onClick={() => setPredicates([])}>Clear</button>) : null}
+            
+            <br/>
             {[...predicates, null].map((predicate, index) => (
                 <span>
                     {codes.map((code) => {
@@ -45,6 +48,7 @@ export function FilterForm(props) {
                     })}
                     <br/>
                     <span>OR</span>
+                    <br/>
                 </span>
             ))}
             

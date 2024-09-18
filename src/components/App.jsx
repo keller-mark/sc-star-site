@@ -6,6 +6,7 @@ export function App(props) {
     const {
         quotes,
         codes,
+        nonemptyCodes,
         sources,
     } = props;
 
@@ -23,18 +24,20 @@ export function App(props) {
         }) : true;
         return isMatch;
     });
+    const paperMatches = quoteMatches.map(quote => quote.data.sourceEntry.data.guid);
+    const numPaperMatches = (new Set(paperMatches)).size;
 
     return (
         <main>
             <div>
                 <h1>scSTAR</h1>
                 <p>Number of papers: {numPapers}</p>
-                <p>Number of quotations: {numQuotes}<span>{predicates.length > 0 ? ` (${quoteMatches.length} match filter, from N unique papers)` : null}</span></p>
+                <p>Number of quotations: {numQuotes}<span>{predicates.length > 0 ? ` (${quoteMatches.length} match filter, from ${numPaperMatches} unique papers)` : null}</span></p>
                 <p>Number of codes: {numCodes}</p>
 
                 <div>
                     <FilterForm
-                        codes={codes}
+                        codes={nonemptyCodes}
                         predicates={predicates}
                         setPredicates={setPredicates}
                     />

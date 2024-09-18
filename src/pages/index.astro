@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { App } from '../components/App.jsx';
 
 import { getCollection, getEntry, getEntries } from 'astro:content';
+import { undefined } from 'astro:schema';
 
 const quotes = await Promise.all((await getCollection('quotations')).map(async quote => ({
 	...quote,
@@ -21,7 +22,10 @@ const codesWithQuotes = codes.map(code => ({
 	...code,
 	quotes: quotes.filter(quote => quote.data.codeEntries.some(coding => coding.data.guid === code.data.guid)),
 }));
-console.log(codesWithQuotes)
+const nonemptyCodes = codesWithQuotes.filter(code => code.quotes.length > 0).map(code => ({
+	...code,
+	quotes: undefined,
+}));
 
 
 const sources = await getCollection('sources');
@@ -33,6 +37,7 @@ const sources = await getCollection('sources');
 	<App
 		client:load
 		codes={codes}
+		nonemptyCodes={nonemptyCodes}
 		sources={sources}
 		quotes={quotes}
 	/>
