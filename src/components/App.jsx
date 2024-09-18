@@ -12,7 +12,7 @@ export function App(props) {
 
     const numPapers = sources.length;
     const numQuotes = quotes.length;
-    const numCodes = codes.length;
+    const numCodes = nonemptyCodes.length;
 
     const [predicates, setPredicates] = useState([]);
 
