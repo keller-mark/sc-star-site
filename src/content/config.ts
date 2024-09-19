@@ -3,7 +3,7 @@ import { z, defineCollection, reference } from 'astro:content';
 
 // 2. Define your collection(s)
 const sourceCollection = defineCollection({
-    type: 'content',
+    type: 'data',
     schema: z.object({
         path: z.string(),
         guid: z.string(),
@@ -12,7 +12,7 @@ const sourceCollection = defineCollection({
 });
 
 const codeCollection = defineCollection({
-    type: 'content',
+    type: 'data',
     schema: z.object({
         guid: z.string(),
         name: z.string(),
@@ -26,7 +26,7 @@ const codeCollection = defineCollection({
 });
 
 const quoteCollection = defineCollection({
-    type: 'content',
+    type: 'data',
     schema: z.object({
         source_guid: reference('sources'),
         attrs: z.object({
@@ -47,7 +47,7 @@ const quoteCollection = defineCollection({
 });
 
 const codeSetCollection = defineCollection({
-    type: 'content',
+    type: 'data',
     schema: z.object({
         attrs: z.object({
             guid: z.string(),

@@ -1,15 +1,18 @@
 import React from 'react';
 
+const isProd = import.meta.env.PROD;
+const imgBaseUrl = isProd ? 'https://sc-star.s3.amazonaws.com/images' : './src/images';
+
 export function Card(props) {
 	const {
 		key,
 		data,
 	} = props;
 
-	const imgUrl = `./src/images/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
+	const imgUrl = `${imgBaseUrl}/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
 
 	return (
-		<div className="link-card">
+		<>
 			<img src={imgUrl} className="quote-img" title={`Figure from ${data.sourceEntry.data.name}`}/>
 
 			<div>
@@ -18,8 +21,8 @@ export function Card(props) {
 						<span className="code-pill">{code.data.name}</span>
 					))}
 				</div>
-		</div>
-		</div>
+			</div>
+		</>
 	);
 }
 /*<

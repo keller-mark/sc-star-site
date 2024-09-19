@@ -1,6 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FilterForm } from './FilterForm.jsx';
 import { Card } from './Card.jsx';
+import { FixedSizeGrid as Grid } from 'react-window';
+import AutoSizer from "react-virtualized-auto-sizer";
+
+
+
+
+const Example = () => (
+    <Grid
+      columnCount={1000}
+      columnWidth={100}
+      height={550}
+      rowCount={1000}
+      rowHeight={35}
+      width={500}
+    >
+      {Cell}
+    </Grid>
+  );
+
 
 export function App(props) {
     const {
@@ -27,10 +46,13 @@ export function App(props) {
     const paperMatches = quoteMatches.map(quote => quote.data.sourceEntry.data.guid);
     const numPaperMatches = (new Set(paperMatches)).size;
 
+    const numColumns = 4;
+
+
     return (
         <main>
-            <div>
-                <h1>scSTAR</h1>
+            <div className="sidebar">
+                <h1>The State of Single-Cell Atlas Data Visualization</h1>
                 <p>Number of papers: {numPapers}</p>
                 <p>Number of quotations: {numQuotes}<span>{predicates.length > 0 ? ` (${quoteMatches.length} match filter, from ${numPaperMatches} unique papers)` : null}</span></p>
                 <p>Number of codes: {numCodes}</p>
@@ -51,17 +73,33 @@ export function App(props) {
                     <p>Filter by code group: </p>
                     */}
                 </div>
-
             </div>
             <div className="cards-container">
-                <div className="quote-cards">
-                    {quoteMatches.map(quote => (
-                        <Card
-                            key={quote.id}
-                            data={quote.data}
-                        />
-                    ))}
-                </div>
+                <AutoSizer key={JSON.stringify(predicates)}>
+                    {({ height, width }) => (
+                        <Grid
+                            columnCount={numColumns}
+                            columnWidth={Math.floor(width / numColumns) - numColumns}
+                            height={height - 1}
+                            rowCount={Math.ceil(quoteMatches.length / numColumns)}
+                            rowHeight={300}
+                            width={width - 1}
+                        >
+                            {({ columnIndex, rowIndex, style }) => {
+                                const quote = quoteMatches[rowIndex * numColumns + columnIndex];
+                                return quote ? (
+                                    <div style={{...style, border: '1px solid rgba(0, 0, 0, 0.1)' }}>
+                                        <Card
+                                            key={quote.id}
+                                            data={quote.data}
+                                        />
+                                    </div>
+                                ) : null;
+                            }}
+                        </Grid>
+                    )}
+                </AutoSizer>
+       
             </div>
         </main>
     );

@@ -36,16 +36,18 @@ export function FilterForm(props) {
             <br/>
             {[...predicates, null].map((predicate, index) => (
                 <span>
-                    {codes.map((code) => {
-                        const includesCode = predicate && predicate.includes(code.data.name);
-                        const codeStyle = {
-                            fontSize: '11px',
-                            backgroundColor: includesCode ? 'lightblue' : 'white'
-                        };
-                        return (
-                            <button style={codeStyle} onClick={() => updatePredicate(index, code.data.name)}>{code.data.name}</button>
-                        );
-                    })}
+                    <div className="filter-button-group">
+                        {codes.map((code) => {
+                            const includesCode = predicate && predicate.includes(code.data.name);
+                            const codeStyle = {
+                                fontSize: '11px',
+                                backgroundColor: includesCode ? 'lightblue' : 'white'
+                            };
+                            return (
+                                <button key={code.data.guid} style={codeStyle} onClick={() => updatePredicate(index, code.data.name)}>{code.data.name}</button>
+                            );
+                        })}
+                    </div>
                     <br/>
                     <span>OR</span>
                     <br/>
