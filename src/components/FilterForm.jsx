@@ -37,7 +37,7 @@ export function FilterForm(props) {
             {[...predicates, null].map((predicate, index) => (
                 <span>
                     <div className="filter-button-group">
-                        {codes.map((code) => {
+                        {codes.sort((a, b) => a.data.name.localeCompare(b.data.name)).map((code) => {
                             const includesCode = predicate && predicate.includes(code.data.name);
                             const codeStyle = {
                                 fontSize: '11px',
