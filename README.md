@@ -20,6 +20,13 @@ cp -r ../qdpx-to-json/data/out/images ./src/images
 pnpm run dev
 ```
 
+Deployment
+
+```sh
+cd ../qdpx-to-json/data/out/content/ && zip -r ../../../../sc-star-site/content.zip . && cd -
+# Upload the new content.zip to S3.
+# May also need to sync ../qdpx-to-json/data/out/images with the S3 bucket's images/ directory.
+```
 
 ## 🚀 Project Structure
 
