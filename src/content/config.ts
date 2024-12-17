@@ -68,5 +68,5 @@ export const collections = {
   'codes': codeCollection,
   'quotations': quoteCollection,
   'sources': sourceCollection,
-  'sets': codeSetCollection,
+  //'sets': codeSetCollection,
 };
