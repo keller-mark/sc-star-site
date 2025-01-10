@@ -13,7 +13,7 @@ export function Card(props) {
 
 	return (
 		<>
-			<img src={imgUrl} className="quote-img" title={`Figure from ${data.sourceEntry.data.name}`}/>
+			<img src={imgUrl} className="quote-img" title={`Subfigure from ${data.sourceEntry.data.name}`}/>
 
 			<div>
 				<div className="codes">

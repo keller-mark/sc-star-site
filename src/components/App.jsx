@@ -52,26 +52,28 @@ export function App(props) {
     return (
         <main>
             <div className="sidebar">
-                <h1>The State of Single-Cell Atlas Data Visualization</h1>
-                <p>Number of papers: {numPapers}</p>
-                <p>Number of quotations: {numQuotes}<span>{predicates.length > 0 ? ` (${quoteMatches.length} match filter, from ${numPaperMatches} unique papers)` : null}</span></p>
-                <p>Number of codes: {numCodes}</p>
+                <div className="sidebar-inner">
+                    <h1>The State of Single-Cell Atlas Data Visualization</h1>
+                    <p>Number of papers: {numPapers}</p>
+                    <p>Number of subfigures: {numQuotes.toLocaleString()}<span>{predicates.length > 0 ? ` (${quoteMatches.length.toLocaleString()} match filter, from ${numPaperMatches} unique papers)` : null}</span></p>
+                    <p>Number of codes: {numCodes}</p>
 
-                <div>
-                    <FilterForm
-                        codes={nonemptyCodes}
-                        predicates={predicates}
-                        setPredicates={setPredicates}
-                    />
-                    {/*
-                    <p>Filter by code:</p>
-                    TODO (allow filtering quotations by multiple codes with AND or OR)
+                    <div>
+                        <FilterForm
+                            codes={nonemptyCodes}
+                            predicates={predicates}
+                            setPredicates={setPredicates}
+                        />
+                        {/*
+                        <p>Filter by code:</p>
+                        TODO (allow filtering quotations by multiple codes with AND or OR)
 
-                    <p>Filter by paper:</p>
-                    <p>Filter by number of cells:</p>
-                    <p>Filter by paper containing quote with code:</p>
-                    <p>Filter by code group: </p>
-                    */}
+                        <p>Filter by paper:</p>
+                        <p>Filter by number of cells:</p>
+                        <p>Filter by paper containing quote with code:</p>
+                        <p>Filter by code group: </p>
+                        */}
+                    </div>
                 </div>
             </div>
             <div className="cards-container">
