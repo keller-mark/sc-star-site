@@ -6,13 +6,15 @@ Static astro site to share literature survey qualitative coding results in the f
 ```sh
 rm -rf ./src/content/codes
 rm -rf ./src/content/quotations
-rm -rf ./src/content/sets
 rm -rf ./src/content/sources
+rm -rf ./src/content/code_groups
+rm -rf ./src/content/source_groups
 
 cp -r ../qdpx-to-json/data/out/content/codes ./src/content/codes
 cp -r ../qdpx-to-json/data/out/content/quotations ./src/content/quotations
-cp -r ../qdpx-to-json/data/out/content/sets ./src/content/sets
 cp -r ../qdpx-to-json/data/out/content/sources ./src/content/sources
+cp -r ../qdpx-to-json/data/out/content/code_groups ./src/content/code_groups
+cp -r ../qdpx-to-json/data/out/content/source_groups ./src/content/source_groups
 
 rm -rf ./src/images
 cp -r ../qdpx-to-json/data/out/images ./src/images

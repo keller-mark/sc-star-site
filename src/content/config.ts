@@ -29,6 +29,7 @@ const quoteCollection = defineCollection({
     type: 'data',
     schema: z.object({
         source_guid: reference('sources'),
+        subfig_num: z.string().nullable(),
         attrs: z.object({
             guid: z.string(),
             page: z.string(),

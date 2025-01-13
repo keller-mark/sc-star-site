@@ -28,4 +28,6 @@ src/content/codes
 src/content/sources
 src/content/quotations
 src/content/sets
+src/content/code_groups
+src/content/source_groups
 *.zip

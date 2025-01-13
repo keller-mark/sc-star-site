@@ -34,6 +34,7 @@ export function App(props) {
     const numCodes = nonemptyCodes.length;
 
     const [predicates, setPredicates] = useState([]);
+    const [showSubfigNums, setShowSubfigNums] = useState(false);
 
     const quoteMatches = quotes.filter(quote => {            
         const isMatch = predicates.length > 0 ? predicates.some(predicate => {
@@ -73,6 +74,8 @@ export function App(props) {
                         <p>Filter by paper containing quote with code:</p>
                         <p>Filter by code group: </p>
                         */}
+                        <br/>
+                        <button onClick={() => setShowSubfigNums(prev => !prev)}>Toggle figure numbers</button>
                     </div>
                 </div>
             </div>
@@ -94,6 +97,7 @@ export function App(props) {
                                         <Card
                                             key={quote.id}
                                             data={quote.data}
+                                            showSubfigNum={showSubfigNums}
                                         />
                                     </div>
                                 ) : null;

@@ -85,12 +85,17 @@ const sources = await getCollection('sources');
 	.codes {
 		width: auto;
 	}
-	.code-pill {
+	.code-pill, .subfig-num {
 		display: inline;
-		background-color: lightblue;
 		border-radius: 15px;
 		padding: 0px 8px;
 		margin: 0px 4px;
+	}
+	.code-pill {
+		background-color: lightblue;
+	}
+	.subfig-num {
+		background-color: lightgreen;
 	}
 	.filter-button-group {
 		display: inline;

@@ -7,6 +7,7 @@ export function Card(props) {
 	const {
 		key,
 		data,
+		showSubfigNum,
 	} = props;
 
 	const imgUrl = `${imgBaseUrl}/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
@@ -17,10 +18,15 @@ export function Card(props) {
 
 			<div>
 				<div className="codes">
+					{showSubfigNum && data.subfig_num !== null ? (
+						<span className="subfig-num">{data.subfig_num}</span>
+					) : null}
 					{data.codeEntries.map(code => (
 						<span className="code-pill">{code.data.name}</span>
 					))}
+					
 				</div>
+				
 			</div>
 		</>
 	);
