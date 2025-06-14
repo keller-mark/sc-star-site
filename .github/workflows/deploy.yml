@@ -31,7 +31,7 @@ jobs:
           run_install: true
       - name: Download and unzip
         run: |
-          curl -L -o ./content.zip https://sc-star.s3.amazonaws.com/content.zip
+          curl -L -o ./content.zip https://sc-star.vitessce.io/content.zip
           unzip -n ./content.zip -d ./src/content
       - run: pnpm run build
       - uses: actions/upload-pages-artifact@v1
