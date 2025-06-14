@@ -1,7 +1,7 @@
 import React from 'react';
 
 const isProd = import.meta.env.PROD;
-const imgBaseUrl = isProd ? 'https://sc-star.s3.amazonaws.com/images' : './src/images';
+const imgBaseUrl = isProd ? 'https://sc-star.vitessce.io/images' : './src/images';
 
 export function Card(props) {
 	const {
