@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FilterForm } from './FilterForm.jsx';
 import { Card } from './Card.jsx';
+import { CodeDistributionChart } from './CodeDistributionChart.jsx';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -35,17 +36,36 @@ export function App(props) {
 
     const [predicates, setPredicates] = useState([]);
     const [showSubfigNums, setShowSubfigNums] = useState(false);
+    const [showChart, setShowChart] = useState(false);
 
-    const quoteMatches = quotes.filter(quote => {            
+    const quoteMatches = useMemo(() => quotes.filter(quote => {
         const isMatch = predicates.length > 0 ? predicates.some(predicate => {
             return predicate.every(codeName => quote.data.codeEntries.map(d => d.data.name).includes(
                 codeName
             ));
         }) : true;
         return isMatch;
-    });
+    }), [quotes, predicates]);
     const paperMatches = quoteMatches.map(quote => quote.data.sourceEntry.data.guid);
     const numPaperMatches = (new Set(paperMatches)).size;
+
+    // Distribution of the matching subfigures across the codes that are not
+    // already part of the filter (selected codes trivially cover every match).
+    const codeDistribution = useMemo(() => {
+        if (!showChart) return [];
+        const selectedCodes = new Set(predicates.flat());
+        const counts = new Map();
+        quoteMatches.forEach(quote => {
+            new Set(quote.data.codeEntries.map(d => d.data.name)).forEach(name => {
+                counts.set(name, (counts.get(name) || 0) + 1);
+            });
+        });
+        return nonemptyCodes
+            .map(code => code.data.name)
+            .filter(name => !selectedCodes.has(name) && counts.get(name) > 0)
+            .map(name => ({ name, count: counts.get(name) }))
+            .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    }, [showChart, predicates, quoteMatches, nonemptyCodes]);
 
     const numColumns = 4;
 
@@ -76,10 +96,34 @@ export function App(props) {
                         */}
                         <br/>
                         <button onClick={() => setShowSubfigNums(prev => !prev)}>Toggle figure numbers</button>
+                        &nbsp;
+                        <button onClick={() => setShowChart(prev => !prev)}>{showChart ? 'Hide' : 'Show'} code distribution chart</button>
                     </div>
                 </div>
             </div>
             <div className="cards-container">
+                {showChart ? (
+                    <div className="chart-container">
+                        <p className="chart-title">
+                            Subfigures per code
+                            {predicates.length > 0 ? ' (among subfigures matching the filter; selected codes omitted)' : ''}
+                        </p>
+                        {codeDistribution.length > 0 ? (
+                            <AutoSizer disableHeight>
+                                {({ width }) => (
+                                    <CodeDistributionChart
+                                        data={codeDistribution}
+                                        total={quoteMatches.length}
+                                        width={width}
+                                    />
+                                )}
+                            </AutoSizer>
+                        ) : (
+                            <p className="chart-empty">No other codes co-occur with the current filter.</p>
+                        )}
+                    </div>
+                ) : null}
+                <div className="grid-container">
                 <AutoSizer key={JSON.stringify(predicates)}>
                     {({ height, width }) => (
                         <Grid
@@ -105,7 +149,7 @@ export function App(props) {
                         </Grid>
                     )}
                 </AutoSizer>
-       
+                </div>
             </div>
         </main>
     );
