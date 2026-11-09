@@ -40,9 +40,10 @@ function barPath(x0, y, w, h, r) {
  * @param {'subfigures' | 'papers'} [props.unit] What the counts quantify.
  * @param {'count' | 'percent'} [props.measure] Plot raw counts, or percentages of `total`.
  * @param {number} props.width Available width in pixels.
+ * @param {(codeName: string) => void} [props.onBarClick] If provided, bars are clickable.
  */
 export function CodeDistributionChart(props) {
-    const { data, total, width, unit = 'subfigures', measure = 'count' } = props;
+    const { data, total, width, unit = 'subfigures', measure = 'count', onBarClick } = props;
     const svgRef = useRef(null);
     const tooltipRef = useRef(null);
 
@@ -123,12 +124,14 @@ export function CodeDistributionChart(props) {
             .attr('width', marginLeft + innerWidth + MARGIN.right)
             .attr('height', y.step())
             .attr('fill', 'transparent')
+            .style('cursor', onBarClick ? 'pointer' : 'default')
             .on('mouseenter', function (event, d) {
                 bars.attr('fill', b => (b.name === d.name ? BAR_HOVER_COLOR : BAR_COLOR));
                 const pct = total > 0 ? (100 * d.count / total).toFixed(1) : '0.0';
                 tooltip
                     .style('display', 'block')
-                    .html(`<strong>${d.name}</strong><br/>${d.count.toLocaleString()} ${d.count === 1 ? unit.replace(/s$/, '') : unit} (${pct}% of ${total.toLocaleString()})`);
+                    .html(`<strong>${d.name}</strong><br/>${d.count.toLocaleString()} ${d.count === 1 ? unit.replace(/s$/, '') : unit} (${pct}% of ${total.toLocaleString()})`
+                        + (onBarClick ? `<br/><em>Click to add to filter (AND)</em>` : ''));
             })
             .on('mousemove', function (event) {
                 const [px, py] = pointer(event, svgRef.current);
@@ -137,8 +140,13 @@ export function CodeDistributionChart(props) {
             .on('mouseleave', function () {
                 bars.attr('fill', BAR_COLOR);
                 tooltip.style('display', 'none');
+            })
+            .on('click', function (event, d) {
+                if (!onBarClick) return;
+                tooltip.style('display', 'none');
+                onBarClick(d.name);
             });
-    }, [data, total, width, unit, measure]);
+    }, [data, total, width, unit, measure, onBarClick]);
 
     return (
         <div style={{ position: 'relative' }}>

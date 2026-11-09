@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { FilterForm } from './FilterForm.jsx';
 import { Card } from './Card.jsx';
 import { CodeDistributionChart } from './CodeDistributionChart.jsx';
@@ -79,6 +79,19 @@ export function App(props) {
             .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     }, [showChart, chartUnit, predicates, quoteMatches, nonemptyCodes]);
 
+    // Clicking a bar ANDs its code into the filter. Only enabled when there is
+    // at most one predicate; with several OR-ed predicates it is ambiguous.
+    const canClickBars = predicates.length <= 1;
+    const handleBarClick = useCallback((codeName) => {
+        setPredicates(prev => {
+            if (prev.length === 0) return [[codeName]];
+            if (prev.length === 1) {
+                return prev[0].includes(codeName) ? prev : [[...prev[0], codeName]];
+            }
+            return prev;
+        });
+    }, []);
+
     const selectedCodes = useMemo(() => new Set(predicates.flat()), [predicates]);
 
     // Relative ordering of codes across each paper's figures (filter-aware).
@@ -135,6 +148,9 @@ export function App(props) {
                                 </span>
                             ) : null}
                         </p>
+                        {!canClickBars ? (
+                            <span className="chart-subtitle">Bar clicking is disabled while the filter has multiple OR-ed criteria.</span>
+                        ) : null}
                         <div className="chart-controls">
                             Count:&nbsp;
                             {[['subfigures', 'Subfigures'], ['papers', 'Papers']].map(([value, label]) => (
@@ -171,6 +187,7 @@ export function App(props) {
                                         total={chartUnit === 'papers' ? numPaperMatches : quoteMatches.length}
                                         unit={chartUnit}
                                         measure={chartMeasure}
+                                        onBarClick={canClickBars ? handleBarClick : undefined}
                                         width={width}
                                     />
                                 )}
