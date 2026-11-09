@@ -36,11 +36,12 @@ function barPath(x0, y, w, h, r) {
  * D3 horizontal bar chart of subfigure counts per code.
  * @param {object} props
  * @param {{ name: string, count: number }[]} props.data Sorted rows to plot.
- * @param {number} props.total Number of subfigures in the current (filtered) set.
+ * @param {number} props.total Number of units (subfigures or papers) in the current (filtered) set.
+ * @param {'subfigures' | 'papers'} [props.unit] What the counts quantify.
  * @param {number} props.width Available width in pixels.
  */
 export function CodeDistributionChart(props) {
-    const { data, total, width } = props;
+    const { data, total, width, unit = 'subfigures' } = props;
     const svgRef = useRef(null);
     const tooltipRef = useRef(null);
 
@@ -117,7 +118,7 @@ export function CodeDistributionChart(props) {
                 const pct = total > 0 ? (100 * d.count / total).toFixed(1) : '0.0';
                 tooltip
                     .style('display', 'block')
-                    .html(`<strong>${d.name}</strong><br/>${d.count.toLocaleString()} subfigures (${pct}% of ${total.toLocaleString()})`);
+                    .html(`<strong>${d.name}</strong><br/>${d.count.toLocaleString()} ${d.count === 1 ? unit.replace(/s$/, '') : unit} (${pct}% of ${total.toLocaleString()})`);
             })
             .on('mousemove', function (event) {
                 const [px, py] = pointer(event, svgRef.current);
@@ -127,11 +128,11 @@ export function CodeDistributionChart(props) {
                 bars.attr('fill', BAR_COLOR);
                 tooltip.style('display', 'none');
             });
-    }, [data, total, width]);
+    }, [data, total, width, unit]);
 
     return (
         <div style={{ position: 'relative' }}>
-            <svg ref={svgRef} role="img" aria-label="Number of subfigures per code" />
+            <svg ref={svgRef} role="img" aria-label={`Number of ${unit} per code`} />
             <div
                 ref={tooltipRef}
                 className="chart-tooltip"

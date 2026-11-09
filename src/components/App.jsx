@@ -39,6 +39,8 @@ export function App(props) {
     const [predicates, setPredicates] = useState([]);
     const [showSubfigNums, setShowSubfigNums] = useState(false);
     const [showChart, setShowChart] = useState(false);
+    // Unit for the code distribution chart: 'subfigures' or 'papers'.
+    const [chartUnit, setChartUnit] = useState('subfigures');
     const [showOrderChart, setShowOrderChart] = useState(false);
 
     const quoteMatches = useMemo(() => quotes.filter(quote => {
@@ -52,23 +54,28 @@ export function App(props) {
     const paperMatches = quoteMatches.map(quote => quote.data.sourceEntry.data.guid);
     const numPaperMatches = (new Set(paperMatches)).size;
 
-    // Distribution of the matching subfigures across the codes that are not
-    // already part of the filter (selected codes trivially cover every match).
+    // Distribution of the matching subfigures (or the papers they come from)
+    // across the codes that are not already part of the filter (selected codes
+    // trivially cover every match).
     const codeDistribution = useMemo(() => {
         if (!showChart) return [];
         const selectedCodes = new Set(predicates.flat());
-        const counts = new Map();
+        // Map of code name -> Set of unique units (subfigure ids or paper guids).
+        const units = new Map();
         quoteMatches.forEach(quote => {
-            new Set(quote.data.codeEntries.map(d => d.data.name)).forEach(name => {
-                counts.set(name, (counts.get(name) || 0) + 1);
+            const unitId = chartUnit === 'papers' ? quote.data.sourceEntry.data.guid : quote.id;
+            quote.data.codeEntries.forEach(d => {
+                const name = d.data.name;
+                if (!units.has(name)) units.set(name, new Set());
+                units.get(name).add(unitId);
             });
         });
         return nonemptyCodes
             .map(code => code.data.name)
-            .filter(name => !selectedCodes.has(name) && counts.get(name) > 0)
-            .map(name => ({ name, count: counts.get(name) }))
+            .filter(name => !selectedCodes.has(name) && units.has(name))
+            .map(name => ({ name, count: units.get(name).size }))
             .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-    }, [showChart, predicates, quoteMatches, nonemptyCodes]);
+    }, [showChart, chartUnit, predicates, quoteMatches, nonemptyCodes]);
 
     const selectedCodes = useMemo(() => new Set(predicates.flat()), [predicates]);
 
@@ -118,15 +125,31 @@ export function App(props) {
                 {showChart ? (
                     <div className="chart-container">
                         <p className="chart-title">
-                            Subfigures per code
-                            {predicates.length > 0 ? ' (among subfigures matching the filter; selected codes omitted)' : ''}
+                            {chartUnit === 'papers' ? 'Papers' : 'Subfigures'} per code
+                            {predicates.length > 0 ? ` (among ${chartUnit === 'papers' ? 'papers with subfigures' : 'subfigures'} matching the filter; selected codes omitted)` : ''}
                         </p>
+                        <div className="chart-controls">
+                            Count:&nbsp;
+                            {[['subfigures', 'Subfigures'], ['papers', 'Papers']].map(([value, label]) => (
+                                <label key={value}>
+                                    <input
+                                        type="radio"
+                                        name="chart-unit"
+                                        value={value}
+                                        checked={chartUnit === value}
+                                        onChange={() => setChartUnit(value)}
+                                    />
+                                    {label}
+                                </label>
+                            ))}
+                        </div>
                         {codeDistribution.length > 0 ? (
                             <AutoSizer disableHeight>
                                 {({ width }) => (
                                     <CodeDistributionChart
                                         data={codeDistribution}
-                                        total={quoteMatches.length}
+                                        total={chartUnit === 'papers' ? numPaperMatches : quoteMatches.length}
+                                        unit={chartUnit}
                                         width={width}
                                     />
                                 )}
