@@ -33,15 +33,16 @@ function barPath(x0, y, w, h, r) {
 }
 
 /**
- * D3 horizontal bar chart of subfigure counts per code.
+ * D3 horizontal bar chart of subfigure (or paper) counts or percentages per code.
  * @param {object} props
  * @param {{ name: string, count: number }[]} props.data Sorted rows to plot.
  * @param {number} props.total Number of units (subfigures or papers) in the current (filtered) set.
  * @param {'subfigures' | 'papers'} [props.unit] What the counts quantify.
+ * @param {'count' | 'percent'} [props.measure] Plot raw counts, or percentages of `total`.
  * @param {number} props.width Available width in pixels.
  */
 export function CodeDistributionChart(props) {
-    const { data, total, width, unit = 'subfigures' } = props;
+    const { data, total, width, unit = 'subfigures', measure = 'count' } = props;
     const svgRef = useRef(null);
     const tooltipRef = useRef(null);
 
@@ -59,10 +60,15 @@ export function CodeDistributionChart(props) {
 
         svg.attr('width', width).attr('height', height);
 
+        const isPercent = measure === 'percent';
+        const valueOf = d => (isPercent ? (total > 0 ? 100 * d.count / total : 0) : d.count);
+        const formatValue = v => (isPercent ? `${v.toFixed(1)}%` : v.toLocaleString());
+
+        // Percentages always use a fixed 0-100% axis; counts scale to the largest bar.
         const x = scaleLinear()
-            .domain([0, Math.max(1, ...data.map(d => d.count))])
-            .nice()
+            .domain(isPercent ? [0, 100] : [0, Math.max(1, ...data.map(valueOf))])
             .range([0, innerWidth]);
+        if (!isPercent) x.nice();
         const y = scaleBand()
             .domain(data.map(d => d.name))
             .range([0, innerHeight])
@@ -72,7 +78,11 @@ export function CodeDistributionChart(props) {
 
         // Recessive top axis + vertical gridlines.
         const axis = g.append('g')
-            .call(axisTop(x).ticks(Math.max(2, Math.floor(innerWidth / 80))).tickSize(-innerHeight).tickSizeOuter(0));
+            .call(axisTop(x)
+                .ticks(Math.max(2, Math.floor(innerWidth / 80)))
+                .tickFormat(isPercent ? (v => `${v}%`) : null)
+                .tickSize(-innerHeight)
+                .tickSizeOuter(0));
         axis.select('.domain').remove();
         axis.selectAll('.tick line').attr('stroke', GRID_COLOR);
         axis.selectAll('.tick text').attr('fill', TEXT_SECONDARY).style('font-size', '10px');
@@ -94,17 +104,17 @@ export function CodeDistributionChart(props) {
             .text(d => d.name);
 
         const bars = rows.append('path')
-            .attr('d', d => barPath(0, 0, x(d.count), y.bandwidth(), BAR_RADIUS))
+            .attr('d', d => barPath(0, 0, x(valueOf(d)), y.bandwidth(), BAR_RADIUS))
             .attr('fill', BAR_COLOR);
 
         // Value labels at the end of each bar.
         rows.append('text')
-            .attr('x', d => x(d.count) + 4)
+            .attr('x', d => x(valueOf(d)) + 4)
             .attr('y', y.bandwidth() / 2)
             .attr('dy', '0.35em')
             .attr('fill', TEXT_SECONDARY)
             .style('font', '10px system-ui, sans-serif')
-            .text(d => d.count.toLocaleString());
+            .text(d => formatValue(valueOf(d)));
 
         // Full-row invisible hit target (bigger than the mark) for hover.
         rows.append('rect')
@@ -128,11 +138,11 @@ export function CodeDistributionChart(props) {
                 bars.attr('fill', BAR_COLOR);
                 tooltip.style('display', 'none');
             });
-    }, [data, total, width, unit]);
+    }, [data, total, width, unit, measure]);
 
     return (
         <div style={{ position: 'relative' }}>
-            <svg ref={svgRef} role="img" aria-label={`Number of ${unit} per code`} />
+            <svg ref={svgRef} role="img" aria-label={`${measure === 'percent' ? 'Percentage' : 'Number'} of ${unit} per code`} />
             <div
                 ref={tooltipRef}
                 className="chart-tooltip"

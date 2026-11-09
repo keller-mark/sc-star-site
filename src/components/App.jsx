@@ -41,6 +41,8 @@ export function App(props) {
     const [showChart, setShowChart] = useState(false);
     // Unit for the code distribution chart: 'subfigures' or 'papers'.
     const [chartUnit, setChartUnit] = useState('subfigures');
+    // Measure for the code distribution chart: 'count' or 'percent'.
+    const [chartMeasure, setChartMeasure] = useState('count');
     const [showOrderChart, setShowOrderChart] = useState(false);
 
     const quoteMatches = useMemo(() => quotes.filter(quote => {
@@ -125,8 +127,13 @@ export function App(props) {
                 {showChart ? (
                     <div className="chart-container">
                         <p className="chart-title">
-                            {chartUnit === 'papers' ? 'Papers' : 'Subfigures'} per code
+                            {chartMeasure === 'percent' ? '% of ' : ''}{chartUnit === 'papers' ? 'Papers' : 'Subfigures'} per code
                             {predicates.length > 0 ? ` (among ${chartUnit === 'papers' ? 'papers with subfigures' : 'subfigures'} matching the filter; selected codes omitted)` : ''}
+                            {chartMeasure === 'percent' ? (
+                                <span className="chart-subtitle">
+                                    {` Denominator: ${(chartUnit === 'papers' ? numPaperMatches : quoteMatches.length).toLocaleString()} ${predicates.length > 0 ? 'matching ' : ''}${chartUnit}. A ${chartUnit === 'papers' ? 'paper' : 'subfigure'} can have multiple codes, so percentages do not sum to 100%.`}
+                                </span>
+                            ) : null}
                         </p>
                         <div className="chart-controls">
                             Count:&nbsp;
@@ -142,6 +149,19 @@ export function App(props) {
                                     {label}
                                 </label>
                             ))}
+                            &nbsp;Show:&nbsp;
+                            {[['count', 'Counts'], ['percent', 'Percentages']].map(([value, label]) => (
+                                <label key={value}>
+                                    <input
+                                        type="radio"
+                                        name="chart-measure"
+                                        value={value}
+                                        checked={chartMeasure === value}
+                                        onChange={() => setChartMeasure(value)}
+                                    />
+                                    {label}
+                                </label>
+                            ))}
                         </div>
                         {codeDistribution.length > 0 ? (
                             <AutoSizer disableHeight>
@@ -150,6 +170,7 @@ export function App(props) {
                                         data={codeDistribution}
                                         total={chartUnit === 'papers' ? numPaperMatches : quoteMatches.length}
                                         unit={chartUnit}
+                                        measure={chartMeasure}
                                         width={width}
                                     />
                                 )}
