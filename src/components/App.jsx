@@ -39,6 +39,8 @@ export function App(props) {
     const [predicates, setPredicates] = useState([]);
     const [showSubfigNums, setShowSubfigNums] = useState(false);
     const [showChart, setShowChart] = useState(false);
+    // Which chart (if any) is expanded to the full window height: null | 'distribution' | 'order'.
+    const [expandedChart, setExpandedChart] = useState(null);
     // Unit for the code distribution chart: 'subfigures' or 'papers'.
     const [chartUnit, setChartUnit] = useState('subfigures');
     // Measure for the code distribution chart: 'count' or 'percent'.
@@ -102,6 +104,21 @@ export function App(props) {
 
     const numColumns = 4;
 
+    // Only honor the expanded state for a chart that is currently shown.
+    const activeExpanded = (expandedChart === 'distribution' && showChart)
+        || (expandedChart === 'order' && showOrderChart && figureOrder)
+        ? expandedChart : null;
+    const isShown = (chart) => activeExpanded === null || activeExpanded === chart;
+    const expandButton = (chart) => (
+        <button
+            className="chart-expand-button"
+            onClick={() => setExpandedChart(activeExpanded === chart ? null : chart)}
+            title={activeExpanded === chart ? 'Restore chart height and show the subfigure grid' : 'Expand chart to the full window height'}
+        >
+            {activeExpanded === chart ? 'Collapse' : 'Expand to full height'}
+        </button>
+    );
+
 
     return (
         <main>
@@ -137,9 +154,10 @@ export function App(props) {
                 </div>
             </div>
             <div className="cards-container">
-                {showChart ? (
-                    <div className="chart-container">
+                {showChart && isShown('distribution') ? (
+                    <div className={`chart-container${activeExpanded === 'distribution' ? ' expanded' : ''}`}>
                         <p className="chart-title">
+                            {expandButton('distribution')}
                             {chartMeasure === 'percent' ? '% of ' : ''}{chartUnit === 'papers' ? 'Papers' : 'Subfigures'} per code
                             {predicates.length > 0 ? ` (among ${chartUnit === 'papers' ? 'papers with subfigures' : 'subfigures'} matching the filter; selected codes omitted)` : ''}
                             {chartMeasure === 'percent' ? (
@@ -197,9 +215,10 @@ export function App(props) {
                         )}
                     </div>
                 ) : null}
-                {showOrderChart && figureOrder ? (
-                    <div className="chart-container">
+                {showOrderChart && figureOrder && isShown('order') ? (
+                    <div className={`chart-container${activeExpanded === 'order' ? ' expanded' : ''}`}>
                         <p className="chart-title">
+                            {expandButton('order')}
                             Order of codes across figures
                             {predicates.length > 0 ? ' (among subfigures matching the filter)' : ''}
                         </p>
@@ -214,6 +233,7 @@ export function App(props) {
                         </AutoSizer>
                     </div>
                 ) : null}
+                {activeExpanded === null ? (
                 <div className="grid-container">
                 <AutoSizer key={JSON.stringify(predicates)}>
                     {({ height, width }) => (
@@ -241,6 +261,7 @@ export function App(props) {
                     )}
                 </AutoSizer>
                 </div>
+                ) : null}
             </div>
         </main>
     );
