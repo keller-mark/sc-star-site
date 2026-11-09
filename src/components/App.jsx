@@ -38,6 +38,7 @@ export function App(props) {
 
     const [predicates, setPredicates] = useState([]);
     const [showSubfigNums, setShowSubfigNums] = useState(false);
+    const [showCodes, setShowCodes] = useState(true);
     const [showChart, setShowChart] = useState(false);
     // Which chart (if any) is expanded to the full window height: null | 'distribution' | 'order'.
     const [expandedChart, setExpandedChart] = useState(null);
@@ -81,7 +82,7 @@ export function App(props) {
             .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     }, [showChart, chartUnit, predicates, quoteMatches, nonemptyCodes]);
 
-    // Clicking a bar ANDs its code into the filter. Only enabled when there is
+    // Clicking a bar (or a code pill on a card) ANDs its code into the filter. Only enabled when there is
     // at most one predicate; with several OR-ed predicates it is ambiguous.
     const canClickBars = predicates.length <= 1;
     const handleBarClick = useCallback((codeName) => {
@@ -146,6 +147,8 @@ export function App(props) {
                         */}
                         <br/>
                         <button onClick={() => setShowSubfigNums(prev => !prev)}>Toggle figure numbers</button>
+                        &nbsp;
+                        <button onClick={() => setShowCodes(prev => !prev)}>Toggle codes</button>
                         &nbsp;
                         <button onClick={() => setShowChart(prev => !prev)}>{showChart ? 'Hide' : 'Show'} code distribution chart</button>
                         &nbsp;
@@ -253,6 +256,8 @@ export function App(props) {
                                             key={quote.id}
                                             data={quote.data}
                                             showSubfigNum={showSubfigNums}
+                                            showCodes={showCodes}
+                                            onCodeClick={canClickBars ? handleBarClick : undefined}
                                         />
                                     </div>
                                 ) : null;
