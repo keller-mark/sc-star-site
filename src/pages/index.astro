@@ -68,7 +68,7 @@ const sources = await getCollection('sources');
 	.chart-container {
 		flex: 0 0 auto;
 		max-height: 45vh;
-		overflow-y: auto;
+		overflow: auto;
 		padding: 4px 8px;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 		background-color: #fcfcfb;
@@ -77,6 +77,34 @@ const sources = await getCollection('sources');
 		margin: 2px 0 4px 0;
 		font-size: 13px;
 		font-weight: 600;
+	}
+	.chart-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		align-items: center;
+		font-size: 12px;
+	}
+	.chart-note {
+		margin: 4px 0;
+		font-size: 11px;
+		color: #52514e;
+	}
+	.chart-legend {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 6px;
+		font-size: 11px;
+		color: #52514e;
+		margin: 4px 0;
+	}
+	.chart-legend-swatch {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		margin-left: 8px;
 	}
 	.chart-empty {
 		font-size: 12px;

@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { FilterForm } from './FilterForm.jsx';
 import { Card } from './Card.jsx';
 import { CodeDistributionChart } from './CodeDistributionChart.jsx';
+import { FigureOrderChart } from './FigureOrderChart.jsx';
+import { computeFigureOrder } from './figureOrder.js';
 import { FixedSizeGrid as Grid } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -37,6 +39,7 @@ export function App(props) {
     const [predicates, setPredicates] = useState([]);
     const [showSubfigNums, setShowSubfigNums] = useState(false);
     const [showChart, setShowChart] = useState(false);
+    const [showOrderChart, setShowOrderChart] = useState(false);
 
     const quoteMatches = useMemo(() => quotes.filter(quote => {
         const isMatch = predicates.length > 0 ? predicates.some(predicate => {
@@ -66,6 +69,14 @@ export function App(props) {
             .map(name => ({ name, count: counts.get(name) }))
             .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     }, [showChart, predicates, quoteMatches, nonemptyCodes]);
+
+    const selectedCodes = useMemo(() => new Set(predicates.flat()), [predicates]);
+
+    // Relative ordering of codes across each paper's figures (filter-aware).
+    const figureOrder = useMemo(() => {
+        if (!showOrderChart) return null;
+        return computeFigureOrder(quotes, quoteMatches);
+    }, [showOrderChart, quotes, quoteMatches]);
 
     const numColumns = 4;
 
@@ -98,6 +109,8 @@ export function App(props) {
                         <button onClick={() => setShowSubfigNums(prev => !prev)}>Toggle figure numbers</button>
                         &nbsp;
                         <button onClick={() => setShowChart(prev => !prev)}>{showChart ? 'Hide' : 'Show'} code distribution chart</button>
+                        &nbsp;
+                        <button onClick={() => setShowOrderChart(prev => !prev)}>{showOrderChart ? 'Hide' : 'Show'} figure order chart</button>
                     </div>
                 </div>
             </div>
@@ -121,6 +134,23 @@ export function App(props) {
                         ) : (
                             <p className="chart-empty">No other codes co-occur with the current filter.</p>
                         )}
+                    </div>
+                ) : null}
+                {showOrderChart && figureOrder ? (
+                    <div className="chart-container">
+                        <p className="chart-title">
+                            Order of codes across figures
+                            {predicates.length > 0 ? ' (among subfigures matching the filter)' : ''}
+                        </p>
+                        <AutoSizer disableHeight>
+                            {({ width }) => (
+                                <FigureOrderChart
+                                    order={figureOrder}
+                                    selectedCodes={selectedCodes}
+                                    width={width}
+                                />
+                            )}
+                        </AutoSizer>
                     </div>
                 ) : null}
                 <div className="grid-container">
