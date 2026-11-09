@@ -8,6 +8,8 @@ export function Card(props) {
 		key,
 		data,
 		showSubfigNum,
+		showCodes = true,
+		onCodeClick,
 	} = props;
 
 	const imgUrl = `${imgBaseUrl}/${data.sourceEntry.data.guid}/${data.attrs.guid}.png`;
@@ -21,9 +23,13 @@ export function Card(props) {
 					{showSubfigNum && data.subfig_num !== null ? (
 						<span className="subfig-num">{data.subfig_num}</span>
 					) : null}
-					{data.codeEntries.map(code => (
-						<span className="code-pill">{code.data.name}</span>
-					))}
+					{showCodes ? data.codeEntries.map(code => (
+						<span
+							className={`code-pill${onCodeClick ? ' clickable' : ''}`}
+							onClick={onCodeClick ? () => onCodeClick(code.data.name) : undefined}
+							title={onCodeClick ? 'Click to add to filter (AND)' : undefined}
+						>{code.data.name}</span>
+					)) : null}
 					
 				</div>
 				

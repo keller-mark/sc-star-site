@@ -56,6 +56,105 @@ const sources = await getCollection('sources');
 	}
 	.cards-container {
 		flex-basis: 80%;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+	.grid-container {
+		flex: 1;
+		min-height: 0;
+	}
+	.chart-container {
+		flex: 0 0 auto;
+		max-height: 45vh;
+		overflow: auto;
+		padding: 4px 8px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+		background-color: #fcfcfb;
+	}
+	.chart-container.expanded {
+		flex: 1 1 auto;
+		max-height: none;
+		min-height: 0;
+		border-bottom: none;
+	}
+	.chart-expand-button {
+		float: right;
+		font-size: 11px;
+		font-weight: 400;
+		margin-left: 8px;
+		cursor: pointer;
+	}
+	.chart-title {
+		margin: 2px 0 4px 0;
+		font-size: 13px;
+		font-weight: 600;
+	}
+	.chart-subtitle {
+		display: block;
+		font-weight: 400;
+		font-size: 11px;
+		color: #52514e;
+	}
+	.chart-controls {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		align-items: center;
+		font-size: 12px;
+	}
+	.chart-note {
+		margin: 4px 0;
+		font-size: 11px;
+		color: #52514e;
+	}
+	.chart-legend {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 6px;
+		font-size: 11px;
+		color: #52514e;
+		margin: 4px 0;
+	}
+	.chart-legend-swatch {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		margin-left: 8px;
+	}
+	.chart-subtitle {
+		display: block;
+		font-weight: 400;
+		font-size: 11px;
+		color: #52514e;
+	}
+	.chart-controls {
+		font-size: 12px;
+		margin-bottom: 4px;
+	}
+	.chart-controls label {
+		margin-right: 8px;
+		cursor: pointer;
+	}
+	.chart-empty {
+		font-size: 12px;
+		color: #52514e;
+	}
+	.chart-tooltip {
+		position: absolute;
+		pointer-events: none;
+		background: white;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 4px;
+		padding: 4px 8px;
+		font-size: 12px;
+		color: #0b0b0b;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+		white-space: nowrap;
+		z-index: 10;
 	}
 	.quote-cards {
 		display: grid;
@@ -93,6 +192,12 @@ const sources = await getCollection('sources');
 	}
 	.code-pill {
 		background-color: lightblue;
+	}
+	.code-pill.clickable {
+		cursor: pointer;
+	}
+	.code-pill.clickable:hover {
+		background-color: #7fc4dc;
 	}
 	.subfig-num {
 		background-color: lightgreen;
