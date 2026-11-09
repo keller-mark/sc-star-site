@@ -82,16 +82,14 @@ export function App(props) {
             .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
     }, [showChart, chartUnit, predicates, quoteMatches, nonemptyCodes]);
 
-    // Clicking a bar (or a code pill on a card) ANDs its code into the filter. Only enabled when there is
-    // at most one predicate; with several OR-ed predicates it is ambiguous.
-    const canClickBars = predicates.length <= 1;
-    const handleBarClick = useCallback((codeName) => {
+    // Clicking a bar (or a code pill on a card) ANDs its code into the filter.
+    // With several OR-ed predicates, the code is ANDed into the last one.
+    const handleCodeClick = useCallback((codeName) => {
         setPredicates(prev => {
             if (prev.length === 0) return [[codeName]];
-            if (prev.length === 1) {
-                return prev[0].includes(codeName) ? prev : [[...prev[0], codeName]];
-            }
-            return prev;
+            const last = prev[prev.length - 1];
+            if (last.includes(codeName)) return prev;
+            return [...prev.slice(0, -1), [...last, codeName]];
         });
     }, []);
 
@@ -151,8 +149,8 @@ export function App(props) {
                         <button onClick={() => setShowCodes(prev => !prev)}>Toggle codes</button>
                         &nbsp;
                         <button onClick={() => setShowChart(prev => !prev)}>{showChart ? 'Hide' : 'Show'} code distribution chart</button>
-                        &nbsp;
-                        <button onClick={() => setShowOrderChart(prev => !prev)}>{showOrderChart ? 'Hide' : 'Show'} figure order chart</button>
+                        {/*&nbsp;
+                        <button onClick={() => setShowOrderChart(prev => !prev)}>{showOrderChart ? 'Hide' : 'Show'} figure order chart</button>*/}
                     </div>
                 </div>
             </div>
@@ -169,9 +167,6 @@ export function App(props) {
                                 </span>
                             ) : null}
                         </p>
-                        {!canClickBars ? (
-                            <span className="chart-subtitle">Bar clicking is disabled while the filter has multiple OR-ed criteria.</span>
-                        ) : null}
                         <div className="chart-controls">
                             Count:&nbsp;
                             {[['subfigures', 'Subfigures'], ['papers', 'Papers']].map(([value, label]) => (
@@ -208,7 +203,7 @@ export function App(props) {
                                         total={chartUnit === 'papers' ? numPaperMatches : quoteMatches.length}
                                         unit={chartUnit}
                                         measure={chartMeasure}
-                                        onBarClick={canClickBars ? handleBarClick : undefined}
+                                        onBarClick={handleCodeClick}
                                         width={width}
                                     />
                                 )}
@@ -257,7 +252,7 @@ export function App(props) {
                                             data={quote.data}
                                             showSubfigNum={showSubfigNums}
                                             showCodes={showCodes}
-                                            onCodeClick={canClickBars ? handleBarClick : undefined}
+                                            onCodeClick={handleCodeClick}
                                         />
                                     </div>
                                 ) : null;
